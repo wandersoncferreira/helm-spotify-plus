@@ -59,11 +59,34 @@
 
 (defun spotify-search (search-term)
   "Search spotify for SEARCH-TERM, returning the results as a Lisp structure."
+<<<<<<< HEAD
+ 
+    (setq artist (split-string search-term ".*a:"))
+    (when artist 
+    	 (setq artist (car (cdr artist)))
+    	 (setq artist (split-string artist " [a-z]:"))
+    	 (setq single-artist (car artist)))
+    (pp artist)
+    (setq track  (split-string search-term ".*t:"))
+    (when track
+                (setq track (car (cdr track)))
+    	        (setq track (split-string track "[a-z]:"))
+    	        (setq track (car track))
+    	        (pp track))
+     ;; Spotify API format:
+     ;; q=album:gold%20artist:abba&type=album
+     (let ((a-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=50" "britney")))
+       (with-current-buffer
+	  (url-retrieve-synchronously a-url)
+	(goto-char url-http-end-of-headers)
+	(json-read))))
+=======
   (let ((a-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=50" search-term)))
     (with-current-buffer
 	(url-retrieve-synchronously a-url)
       (goto-char url-http-end-of-headers)
       (json-read))))
+>>>>>>> 105bf81dd7d5f0d78b442f76b12c13d258a905c6
 
 (defun spotify-format-track (track)
   "Given a TRACK, return a a formatted string suitable for display."
