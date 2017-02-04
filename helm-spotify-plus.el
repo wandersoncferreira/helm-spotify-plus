@@ -1,8 +1,9 @@
-;;; package --- Helm-spotify-plus
-;;; Commentary:
+;;; helm-spotify.el --- Control Spotify with Helm.
+;; Copyright 2013 Kris Jenkins
+;;
 ;;; Code:
-;;; API Reference: https://developer.spotify.com/technologies/web-api/
 
+;;; API Reference: https://developer.spotify.com/technologies/web-api/
 (require 'url)
 (require 'json)
 (require 'helm)
@@ -58,6 +59,7 @@
 
 (defun spotify-search (search-term)
   "Search spotify for SEARCH-TERM, returning the results as a Lisp structure."
+<<<<<<< HEAD
  
     (setq artist (split-string search-term ".*a:"))
     (when artist 
@@ -78,6 +80,13 @@
 	  (url-retrieve-synchronously a-url)
 	(goto-char url-http-end-of-headers)
 	(json-read))))
+=======
+  (let ((a-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=50" search-term)))
+    (with-current-buffer
+	(url-retrieve-synchronously a-url)
+      (goto-char url-http-end-of-headers)
+      (json-read))))
+>>>>>>> 105bf81dd7d5f0d78b442f76b12c13d258a905c6
 
 (defun spotify-format-track (track)
   "Given a TRACK, return a a formatted string suitable for display."
@@ -89,7 +98,7 @@
 			      (alist-get '(artists) track))))
     (format "%s (%dm%0.2ds)\n%s - %s"
 	    track-name
-	    (/ track-length 120) (mod track-length 120)
+	    (/ track-length 60) (mod track-length 60)
 	    (mapconcat 'identity artist-names "/")
 	    album-name)))
 
@@ -114,7 +123,7 @@
     (volatile)
     (delayed)
     (multiline)
-    (requires-pattern . 1)
+    (requires-pattern . 2)
     (candidates-process . helm-spotify-search)
     (action-transformer . helm-spotify-actions-for-track)))
 
