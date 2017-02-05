@@ -56,22 +56,10 @@
   (let ((album-uri (alist-get '(album uri) track)))
     (spotify-play-href album-uri)))
 
-;; find the artist and the track of a given string. The used separator is :
-;; example of query-string:  :a:Bob Dylan :t: Track
-(setq artist-name "")
-(setq track-name "")
-(defun find-artist-and-track (complete-list)
-  (let ((match-value-list (cons (nth 0 complete-list) (nth 1 complete-list))))
-    (when complete-list
-      (cond ((string= (car match-value-list) "a") (setq artist-name (cdr match-value-list)))
-	    ((string= (car match-value-list) "t") (setq track-name  (cdr match-value-list))))
-      (find-artist-and-track (cdr (cdr complete-list))))))
-
 
 (defun spotify-search (search-term)
   "Search spotify for SEARCH-TERM, returning the results as a Lisp structure."
-  (find-artist-and-track (cdr (split-string search-term ":")))
-  (let ((a-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=50" artist-name)))
+  (let ((a-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=50" search-term)))
     (with-current-buffer
 	(url-retrieve-synchronously a-url)
       (goto-char url-http-end-of-headers)
@@ -98,8 +86,8 @@
 	  (alist-get '(tracks items) (spotify-search search-term))))
 
 
-(defun helm-spotify-search (search-term)
-  (spotify-search-formatted search-term))
+(defun helm-spotify-search ()
+  (spotify-search-formatted helm-pattern))
 
 (defun helm-spotify-actions-for-track (actions track)
   "Return a list of helm ACTIONS available for this TRACK."
@@ -123,15 +111,6 @@
   (interactive)
   (helm :sources '(helm-source-spotify-track-search)
 	:buffer "*helm-spotify*"))
-
-
-(defun helm-test ()
-  (interactive)
-  (helm :sources (helm-build-sync-source "test"
-		 :candidates (helm-spotify-search ":a:muse")
-		 :fuzzy-match t)
-      :buffer "*helm test*"))
-
 
 (provide 'helm-spotify)
 ;;; helm-spotify.el ends here
