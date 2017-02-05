@@ -53,17 +53,18 @@
 
 (defun spotify-play-album (track)
   "Get the Spotify app to play the album for this TRACK."
-  (let ((first-track (spotify-get-track (alist-get '(album href) track))))
-    (spotify-play-href (alist-get '(uri) first-track))))
+  (let ((album-uri (alist-get '(album uri) track)))
+    (spotify-play-href album-uri)))
 
 
 (defun spotify-search (search-term)
   "Search spotify for SEARCH-TERM, returning the results as a Lisp structure."
-  (let ((a-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=50" search-term)))
+  (let ((a-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=50" search-term)))
     (with-current-buffer
 	(url-retrieve-synchronously a-url)
       (goto-char url-http-end-of-headers)
       (json-read))))
+
 
 (defun spotify-format-track (track)
   "Given a TRACK, return a a formatted string suitable for display."
