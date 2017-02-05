@@ -53,9 +53,8 @@
 
 (defun spotify-play-album (track)
   "Get the Spotify app to play the album for this TRACK."
-  (let ((first-track (spotify-get-track (alist-get '(album href) track))))
-    (spotify-play-href (alist-get '(uri) first-track))))
-
+  (let ((album-uri (alist-get '(album uri) track)))
+    (spotify-play-href album-uri)))
 
 ;; find the artist and the track of a given string. The used separator is :
 ;; example of query-string:  :a:Bob Dylan :t: Track
