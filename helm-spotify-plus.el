@@ -73,7 +73,7 @@
       (setq final-list (append final-list (spotify-search-formatted-helper search-term number))))))
 
 (defun spotify-search (search-term offset)
-  (let ((a-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=%d&offset=%d" search-term limit-per-request (* limit-per-request offset))))
+  (let ((a-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%d&offset=%d" search-term limit-per-request (* limit-per-request offset))))
     (with-current-buffer
 	(url-retrieve-synchronously a-url)
       (goto-char url-http-end-of-headers)
@@ -93,8 +93,8 @@
 	    (mapconcat 'identity artist-names "/")
 	    album-name)))
 
-(defun helm-spotify-search ()
-  (spotify-improved-search-formatted helm-pattern))
+(defun helm-spotify-search (search-term)
+  (spotify-improved-search-formatted search-term))
 
 (defun helm-spotify-actions-for-track (actions track)
   "Return a list of helm ACTIONS available for this TRACK."
@@ -102,22 +102,25 @@
     (,(format "Play Album - %s" (alist-get '(album name) track)) . spotify-play-album)
     ("Show Track Metadata" . pp)))
 
-;;;###autoload
-(defvar helm-source-spotify-track-search
-  '((name . "Spotify")
-    (volatile)
-    (delayed)
-    (multiline)
-    (requires-pattern . 2)
-    (candidates-process . helm-spotify-search)
-    (action-transformer . helm-spotify-actions-for-track)))
+
+(defun get-search-string ()
+  (read-string "Enter the (partial/full) name of an Track: "))
 
 ;;;###autoload
 (defun helm-spotify ()
-  "Bring up a Spotify search interface in helm."
+  "Brind up a custom PROMPT asking for the name of the Artist to perform the search and them all the candidates ready to be narrowed."
   (interactive)
-  (helm :sources '(helm-source-spotify-track-search)
+  (helm :sources (helm-build-sync-source "Spotify"
+		   :init (setq search-string (get-search-string))
+		   :candidates
+		   (helm-spotify-search search-string)
+		   :multiline t
+		   :action-transformer
+		   (lambda (actions track)
+		     (helm-spotify-actions-for-track actions track)))
 	:buffer "*helm-spotify*"))
+
+
 
 (provide 'helm-spotify)
 ;;; helm-spotify.el ends here
