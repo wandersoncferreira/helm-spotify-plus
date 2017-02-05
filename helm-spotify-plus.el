@@ -57,14 +57,27 @@
     (spotify-play-href album-uri)))
 
 
-(defun spotify-search (search-term)
-  "Search spotify for SEARCH-TERM, returning the results as a Lisp structure."
-  (let ((a-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=50" search-term)))
+;; magic numbers!
+(setq number-of-pages 5)
+(setq limit-per-request 50)
+(setq helm-candidate-number-limit (* number-of-pages limit-per-request))
+
+(defun spotify-search-formatted-helper (search-term offset)
+  (mapcar (lambda (track)
+	    (cons (spotify-format-track track) track))
+	  (alist-get '(tracks items) (spotify-search search-term offset))))
+
+(defun spotify-improved-search-formatted (search-term)
+  (let ((final-list '()))
+    (dotimes (number number-of-pages final-list)
+      (setq final-list (append final-list (spotify-search-formatted-helper search-term number))))))
+
+(defun spotify-search (search-term offset)
+  (let ((a-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=%d&offset=%d" search-term limit-per-request (* limit-per-request offset))))
     (with-current-buffer
 	(url-retrieve-synchronously a-url)
       (goto-char url-http-end-of-headers)
       (json-read))))
-
 
 (defun spotify-format-track (track)
   "Given a TRACK, return a a formatted string suitable for display."
@@ -80,14 +93,8 @@
 	    (mapconcat 'identity artist-names "/")
 	    album-name)))
 
-(defun spotify-search-formatted (search-term)
-  (mapcar (lambda (track)
-	    (cons (spotify-format-track track) track))
-	  (alist-get '(tracks items) (spotify-search search-term))))
-
-
 (defun helm-spotify-search ()
-  (spotify-search-formatted helm-pattern))
+  (spotify-improved-search-formatted helm-pattern))
 
 (defun helm-spotify-actions-for-track (actions track)
   "Return a list of helm ACTIONS available for this TRACK."
