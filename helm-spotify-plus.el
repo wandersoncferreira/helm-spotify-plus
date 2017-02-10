@@ -6,9 +6,21 @@
 ;;; API Reference: https://developer.spotify.com/technologies/web-api/
 (require 'url)
 (require 'json)
-(require 'helm)
-(require 'multi)
 
+;; installing helm - using use-package!
+(if 'use-package
+    (progn 
+      (use-package helm
+        :ensure t
+        :diminish helm-mode
+        :config
+        (helm-autoresize-mode 1)
+        (setq helm-autoresize-max-height 30)
+        (setq helm-autoresize-min-height 20))
+      (use-package multi
+        :ensure t))
+  (message "You need to install Helm to make use of this module. Future releases will provide it"))
+      
 (defun alist-get (symbols alist)
   "Look up the value for the chain of SYMBOLS in ALIST."
   (if symbols
