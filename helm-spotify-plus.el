@@ -1,6 +1,4 @@
-;;; helm-spotify.el --- Control Spotify with Helm.
-;; Copyright 2013 Kris Jenkins
-;;
+;;; helm-spotify-plus.el --- Control Spotify with Helm.
 ;;; Code:
 
 ;;; API Reference: https://developer.spotify.com/technologies/web-api/
@@ -134,5 +132,5 @@
 
 
 
-(provide 'helm-spotify)
-;;; helm-spotify.el ends here
+(provide 'helm-spotify-plus)
+;;; helm-spotify-plus.el ends here
