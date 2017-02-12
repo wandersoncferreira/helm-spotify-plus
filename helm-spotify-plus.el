@@ -49,7 +49,7 @@
 
 (defun spotify-action (action)
   (shell-command
-   (format "dbus-send  --print-reply --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.%s" action)))
+   (format "dbus-send --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.%s" action)))
 
 (defun spotify-next ()
   (interactive)
