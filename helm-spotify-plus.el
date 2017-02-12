@@ -42,6 +42,39 @@
   (shell-command (format "dbus-send --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\""
 			 href)))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Spotify controllers ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun spotify-action (action)
+  (shell-command
+   (format "dbus-send  --print-reply --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.%s" action)))
+
+(defun spotify-next ()
+  (interactive)
+  (spotify-action "Next"))
+
+(defun spotify-pause ()
+  (interactive)
+  (spotify-action "Pause"))
+
+(defun spotify-play ()
+  (interactive)
+  (spotify-action "Play"))
+
+(defun spotify-previous ()
+  (interactive)
+  (spotify-action "Previous"))
+
+(defun spotify-toggle-play/pause ()
+  (interactive)
+  (spotify-action "PlayPause"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; End of spotify controllers definition. ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defmulti-method spotify-play-href 'windows-nt
   (href)
   (shell-command (format "explorer %S" href)))
