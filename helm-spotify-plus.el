@@ -105,22 +105,53 @@
 (setq limit-per-request 50)
 (setq helm-candidate-number-limit (* number-of-pages limit-per-request))
 
-(defun spotify-search-formatted-helper (search-term offset)
-  (mapcar (lambda (track)
-	    (cons (spotify-format-track track) track))
-	  (alist-get '(tracks items) (spotify-search search-term offset))))
 
 (defun spotify-improved-search-formatted (search-term)
   (let ((final-list '()))
-    (dotimes (number number-of-pages final-list)
-      (setq final-list (append final-list (spotify-search-formatted-helper search-term number))))))
+    (dotimes (counter number-of-pages final-list)
+      (setq final-list (append final-list (spotify-search-formatted-helper search-term counter))))))
 
-(defun spotify-search (search-term offset)
-  (let ((a-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%d&offset=%d" search-term limit-per-request (* limit-per-request offset))))
-    (with-current-buffer
-	(url-retrieve-synchronously a-url)
-      (goto-char url-http-end-of-headers)
-      (json-read))))
+
+(defun spotify-search-formatted-helper (search-term counter)
+  (mapcar (lambda (track)
+	    (cons (spotify-format-track track) track))
+	  (alist-get '(tracks items) (spotify-artist-track-search search-term counter))))
+
+(defun spotify-artist-track-search (search-term counter)
+  (let ((offset (* limit-per-request counter)))
+    (cond
+     
+     ((and (string-match "a:" search-term) (string-match "t:" search-term)) ;both the artist and track name are available
+      (setq artist-name (spotify-split-string "a" search-term))
+      (setq track-name (spotify-split-string "t" search-term))
+      (setq new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&%s&type=artist&limit=%s&offset=%d" track-name artist-name limit-per-request offset))
+      (spotify-search new-url))
+     
+     ((string-match "a:" search-term)	;only the artist name was given
+      (setq artist-name (spotify-split-string "a" search-term))
+      (setq new-url (format "https://api.spotify.com/v1/search?q=%s&type=artist&limit=%s&offset=%d" artist-name limit-per-request offset))
+      (spotify-search new-url))
+     
+     ((string-match "t:" search-term)	; only the track name was given
+      (setq track-name (spotify-split-string "t" search-term))
+      (setq new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" track-name limit-per-request offset))
+      (spotify-search new-url))
+     
+     (t					;Else case... do a regular search for the track name
+      (setq new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" search-term limit-per-request offset))
+      (spotify-search new-url)))))
+
+(defun spotify-split-string (letter search-term)
+  (let* ((delimiter (format ".*%s:" letter))
+	 (name-tmp (car (cdr (split-string search-term delimiter))))
+	 (name (car (split-string name-tmp " [a-z]:"))))
+    (string-trim name)))
+
+(defun spotify-search (a-url)
+  (with-current-buffer
+      (url-retrieve-synchronously a-url)
+    (goto-char url-http-end-of-headers)
+    (json-read)))
 
 (defun spotify-format-track (track)
   "Given a TRACK, return a a formatted string suitable for display."
@@ -162,8 +193,6 @@
 		   (lambda (actions track)
 		     (helm-spotify-actions-for-track actions track)))
 	:buffer "*helm-spotify*"))
-
-
 
 (provide 'helm-spotify-plus)
 ;;; helm-spotify-plus.el ends here
