@@ -153,13 +153,17 @@
     (goto-char url-http-end-of-headers)
     (json-read)))
 
+(defun decode-string-utf8 (string)
+  (decode-coding-string (string-make-unibyte string) 'utf-8)
+  )
+
 (defun spotify-format-track (track)
   "Given a TRACK, return a a formatted string suitable for display."
-  (let ((track-name   (alist-get '(name) track))
+  (let ((track-name   (decode-string-utf8 (alist-get '(name) track)))
 	(track-length (/ (alist-get '(duration_ms) track) 1000))
-	(album-name   (alist-get '(album name) track))
+	(album-name  (decode-string-utf8 (alist-get '(album name) track)))
 	(artist-names (mapcar (lambda (artist)
-				(alist-get '(name) artist))
+				(decode-string-utf8 (alist-get '(name) artist)))
 			      (alist-get '(artists) track))))
     (format "%s (%dm%0.2ds)\n%s - %s"
 	    track-name
@@ -186,8 +190,7 @@
   (interactive)
   (helm :sources (helm-build-sync-source "Spotify"
 		   :init (setq search-string (get-search-string))
-		   :candidates
-		   (helm-spotify-search search-string)
+		   :candidates (helm-spotify-search search-string)
 		   :multiline t
 		   :action-transformer
 		   (lambda (actions track)
