@@ -1,4 +1,5 @@
 ;;; helm-spotify-plus.el --- Control Spotify with Helm.
+;;; Commentary:
 ;;; Code:
 
 ;;; API Reference: https://developer.spotify.com/technologies/web-api/
@@ -185,7 +186,7 @@
   (read-string "Enter the (partial/full) name of an Track: "))
 
 ;;;###autoload
-(defun helm-spotify ()
+(defun helm-spotify-plus ()
   "Brind up a custom PROMPT asking for the name of the Artist to perform the search and them all the candidates ready to be narrowed."
   (interactive)
   (helm :sources (helm-build-sync-source "Spotify"
