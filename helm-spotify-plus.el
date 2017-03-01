@@ -177,8 +177,8 @@
 
 (defun helm-spotify-actions-for-track (actions track)
   "Return a list of helm ACTIONS available for this TRACK."
-  `((,(format "Play Track - %s" (alist-get '(name) track))       . spotify-play-track)
-    (,(format "Play Album - %s" (alist-get '(album name) track)) . spotify-play-album)
+  `((,(format "Play Track - %s" (decode-string-utf8 (alist-get '(name) track)))       . spotify-play-track)
+    (,(format "Play Album - %s" (decode-string-utf8 (alist-get '(album name) track))) . spotify-play-album)
     ("Show Track Metadata" . pp)))
 
 
