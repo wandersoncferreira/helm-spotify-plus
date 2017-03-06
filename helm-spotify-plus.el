@@ -29,7 +29,7 @@
 ;;; API Reference: https://developer.spotify.com/technologies/web-api/
 (require 'url)
 (require 'json)
-(require 'helm-config)
+(require 'helm)
 (require 'multi)
 (require 'subr-x)
 
