@@ -146,18 +146,18 @@
     (cond
      
      ((and (string-match "a:" search-term) (string-match "t:" search-term)) ;both the artist and track name are available
-      (let ((artist-name (helm-spotify-plus-split-string "a" search-term))
+      (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
             (track-name (helm-spotify-plus-split-string "t" search-term))
             (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&%s&type=artist&limit=%s&offset=%d" track-name artist-name limit-per-request offset)))
         (helm-spotify-plus-request new-url)))
      
      ((string-match "a:" search-term)	;only the artist name was given
-      (let ((artist-name (helm-spotify-plus-split-string "a" search-term))
+      (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
             (new-url (format "https://api.spotify.com/v1/search?q=%s&type=artist&limit=%s&offset=%d" artist-name limit-per-request offset)))
         (helm-spotify-plus-request new-url)))
      
      ((string-match "t:" search-term)	; only the track name was given
-      (let ((track-name (helm-spotify-plus-split-string "t" search-term))
+      (let* ((track-name (helm-spotify-plus-split-string "t" search-term))
             (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" track-name limit-per-request offset)))
         (helm-spotify-plus-request new-url)))
      
