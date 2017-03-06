@@ -7,21 +7,28 @@ Helm is used only to narrow the candidates get from the Spotify API.
 
 
 # How to install
-For now, there are only one way to install this package. You need to have the *use-package* functionality and load the package provided here through:
+For now, there are only one way to install this package.
 
+Clone the repo:
+```emacs-lisp
+cd ~/.emacs.d/site-packages
+git clone submodule add https://github.com/wandersoncferreira/helm-spotify-plus
+```
 ``` emacs-lisp
-(add-to-list 'load-path "~/helm-spotify-plus")
+(add-to-list 'load-path "~/emacs.d/site-packages/helm-spotify-plus")
 (require 'helm-spotify-plus)
 ```
 
-This will install the helm-core and two more libraries necessary to run Helm spotify plus: json and multi.
-
+You need to install the helm-core and the multi libraries that are necessary to run Helm spotify plus.
+We are already in the process of the MELPA repo. *hold on o/*
 
 # How to use it
 
 There are one basic command *helm-spotify-plus* that will ask for an input from the user:
 
-**Enter the (partial/full) name of a Track:**
+```shell
+Enter the (partial/full) name of a Track:
+```
 
 This will fill a list of 250 candidates from where you can choose the right one through Helm interface. 
 
