@@ -46,14 +46,12 @@
   system-type)
 
 (defmulti-method helm-spotify-plus-play-href 'darwin
-  "Play app in OS systems."
   (href)
   (shell-command (format "osascript -e 'tell application %S to play track %S'"
 			 "Spotify"
 			 href)))
 
 (defmulti-method helm-spotify-plus-play-href 'gnu/linux
-  "Play app in Linux systems."
   (href)
   (shell-command "dbus-send  --print-reply --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Pause")
   (shell-command (format "dbus-send --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\""
@@ -72,39 +70,37 @@
 (defun helm-spotify-plus-next ()
   "Play the next song."
   (interactive)
-  (spotify-action "Next"))
+  (helm-spotify-plus-action "Next"))
 
 (defun helm-spotify-plus-pause ()
   "Pause the current song."
   (interactive)
-  (spotify-action "Pause"))
+  (helm-spotify-plus-action "Pause"))
 
 (defun helm-spotify-plus-play ()
   "Play a song."
   (interactive)
-  (spotify-action "Play"))
+  (helm-spotify-plus-action "Play"))
 
 (defun helm-spotify-plus-previous ()
   "Plays previous song."
   (interactive)
-  (spotify-action "Previous"))
+  (helm-spotify-plus-action "Previous"))
 
 (defun helm-spotify-plus-toggle-play-pause ()
   "Toggle between play and pause song."
   (interactive)
-  (spotify-action "PlayPause"))
+  (helm-spotify-plus-action "PlayPause"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End of spotify controllers definition. ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmulti-method helm-spotify-plus-play-href 'windows-nt
-  "Play song at windows systems."
   (href)
   (shell-command (format "explorer %S" href)))
 
 (defmulti-method-fallback helm-spotify-plus-play-href
-  "Fallback method if nothing is found."
   (href)
   (message "Sorry, helm-spotify does not support playing tracks on %S." system-type))
 
