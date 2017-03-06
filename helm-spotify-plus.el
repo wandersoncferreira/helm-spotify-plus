@@ -121,9 +121,14 @@
 
 
 ;; magic numbers!
-(setq number-of-pages 5)
-(setq limit-per-request 50)
-(setq helm-candidate-number-limit (* number-of-pages limit-per-request))
+(defvar number-of-pages 5
+  "Magic number to control the number of pages of the request.")
+
+(defvar limit-per-request 50
+  "Magic number to control the limit of candidates that Spotify API allows per request.")
+
+(defvar helm-candidate-number-limit (* number-of-pages limit-per-request)
+  "Magic number to control the helm candidate numer limit.")
 
 
 (defun helm-spotify-plus-improved-search-formatted (search-term)
