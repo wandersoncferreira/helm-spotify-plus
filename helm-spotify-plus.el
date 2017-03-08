@@ -33,6 +33,9 @@
 (require 'multi)
 (require 'subr-x)
 
+(defvar helm-spotify-plus-dbus-prefer-local t
+  "Variable to define if DBUs interface should use the local machine by default over remote sessions.")
+
       
 (defun helm-spotify-plus-alist-get (symbols alist)
   "Look up the value for the chain of SYMBOLS in ALIST."
@@ -51,11 +54,19 @@
 			 "Spotify"
 			 href)))
 
+(defvar helm-spotify-plus-dbus-call "dbus-send  --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 "
+  "Variable to hold the dbus call string.")
+
 (defmulti-method helm-spotify-plus-play-href 'gnu/linux
   (href)
-  (shell-command "dbus-send  --print-reply --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Pause")
-  (shell-command (format "dbus-send --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\""
+  (if helm-spotify-plus-dbus-prefer-local
+      (progn
+	(call-process "/bin/bash" nil nil nil "-c" (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
+	(call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
 			 href)))
+    (shell-command (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
+    (shell-command (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
+			 href))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -64,8 +75,10 @@
 
 (defun helm-spotify-plus-action (action)
   "Send a given ACTION to dbus."
-  (shell-command
-   (format "dbus-send --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.%s" action)))
+  (if helm-spotify-plus-dbus-prefer-local
+      (call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.%s") action))
+    (shell-command
+     (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.%s") action))))
 
 (defun helm-spotify-plus-next ()
   "Play the next song."
@@ -117,20 +130,17 @@
 
 
 ;; magic numbers!
-(defvar number-of-pages 5
+(defvar helm-spotify-plus-page-number 5
   "Magic number to control the number of pages of the request.")
 
-(defvar limit-per-request 50
+(defvar helm-spotify-plus-limit-per-request 50
   "Magic number to control the limit of candidates that Spotify API allows per request.")
-
-(defvar helm-candidate-number-limit (* number-of-pages limit-per-request)
-  "Magic number to control the helm candidate numer limit.")
 
 
 (defun helm-spotify-plus-improved-search-formatted (search-term)
   "Improved version of the out spotify-search formatted using the SEARCH-TERM."
   (let ((final-list '()))
-    (dotimes (counter number-of-pages final-list)
+    (dotimes (counter helm-spotify-plus-page-number final-list)
       (setq final-list (append final-list (helm-spotify-plus-search-formatted-helper search-term counter))))))
 
 
@@ -142,27 +152,27 @@
 
 (defun helm-spotify-plus-artist-track-search (search-term counter)
   "Function to get the current match between the SEARCH-TERM and amount of requests defined by COUNTER."
-  (let ((offset (* limit-per-request counter)))
+  (let ((offset (* helm-spotify-plus-limit-per-request counter)))
     (cond
      
      ((and (string-match "a:" search-term) (string-match "t:" search-term)) ;both the artist and track name are available
       (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
             (track-name (helm-spotify-plus-split-string "t" search-term))
-            (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&%s&type=artist&limit=%s&offset=%d" track-name artist-name limit-per-request offset)))
+            (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&%s&type=artist&limit=%s&offset=%d" track-name artist-name helm-spotify-plus-limit-per-request offset)))
         (helm-spotify-plus-request new-url)))
      
      ((string-match "a:" search-term)	;only the artist name was given
       (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
-            (new-url (format "https://api.spotify.com/v1/search?q=%s&type=artist&limit=%s&offset=%d" artist-name limit-per-request offset)))
+            (new-url (format "https://api.spotify.com/v1/search?q=%s&type=artist&limit=%s&offset=%d" artist-name helm-spotify-plus-limit-per-request offset)))
         (helm-spotify-plus-request new-url)))
      
      ((string-match "t:" search-term)	; only the track name was given
       (let* ((track-name (helm-spotify-plus-split-string "t" search-term))
-            (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" track-name limit-per-request offset)))
+            (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" track-name helm-spotify-plus-limit-per-request offset)))
         (helm-spotify-plus-request new-url)))
      
      (t					;Else case... do a regular search for the track name
-      (let ((new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" search-term limit-per-request offset)))
+      (let ((new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" search-term helm-spotify-plus-limit-per-request offset)))
         (helm-spotify-plus-request new-url))))))
 
 (defun helm-spotify-plus-split-string (letter search-term)
