@@ -33,7 +33,7 @@
 (require 'multi)
 (require 'subr-x)
 
-(defvar helm-spotify-plus-dbus-prefer-local t
+(defcustom helm-spotify-plus-dbus-prefer-local t
   "Variable to define if DBUs interface should use the local machine by default over remote sessions.")
 
       
@@ -130,7 +130,7 @@
 
 
 ;; magic numbers!
-(defvar helm-spotify-plus-page-number 5
+(defcustom helm-spotify-plus-page-number 5
   "Magic number to control the number of pages of the request.")
 
 (defvar helm-spotify-plus-limit-per-request 50
