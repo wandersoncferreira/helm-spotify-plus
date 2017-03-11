@@ -1,4 +1,4 @@
-;;; helm-spotify-plus.el --- Control Spotify with Helm.
+;;; helm-spotify-plus.el --- Control Spotify, search and select music with Helm.
 
 ;; Copyright (C)
 ;; Author: Wanderson Ferreira <https://github.com/wandersoncferreira> and Luis Moneda <https://github.com/lgmoneda>
