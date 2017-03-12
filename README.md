@@ -25,7 +25,7 @@ git clone submodule add https://github.com/wandersoncferreira/helm-spotify-plus
 (add-to-list 'load-path "~/emacs.d/site-packages/helm-spotify-plus")
 (require 'helm-spotify-plus)
 ```
-**Dependencies:
+### Dependencies:
     + [Helm](https://github.com/emacs-helm/helm)
     + [Multi](https://github.com/kurisuwhyte/emacs-multi)
 
