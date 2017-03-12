@@ -1,13 +1,13 @@
 # Helm Spotify Plus
 A search & play interface for Spotify
 
-There are several changes to the prior Helm-spotify package. 
+There are several changes to the prior Helm-spotify package.
 
-Helm is used only to narrow the candidates get from the Spotify API.
+Helm is used here to only narrow the candidates we got from Spotify API requests.
 
 
 # How to install
-You can installed this package through [MELPA](https://melpa.org).
+You can installed this package from [MELPA](https://melpa.org).
 
 ``` emacs-lisp
 M-x package-refresh-contents
@@ -25,45 +25,56 @@ git clone submodule add https://github.com/wandersoncferreira/helm-spotify-plus
 (add-to-list 'load-path "~/emacs.d/site-packages/helm-spotify-plus")
 (require 'helm-spotify-plus)
 ```
-
-You need to install the helm-core and the multi libraries that are necessary to run Helm spotify plus.
-
+**Dependencies:
+    + [Helm](https://github.com/emacs-helm/helm)
+    + [Multi](https://github.com/kurisuwhyte/emacs-multi)
 
 # How to use it
 
-There are one basic command *helm-spotify-plus* that will ask for an input from the user:
+There are one basic command *helm-spotify-plus* that will ask you for an input string:
 
 ```shell
-Enter the (partial/full) name of a Track:
+Enter the (partial/full) name of a Track/Artist:
 ```
 
-This will fill a list of 250 candidates from where you can choose the right one through Helm interface. 
+A list of 250 candidates will popup using a Helm interface.
 
 
-Example of string query:
+There is also a concept of **keywords** which are tokens to explicitly organize your query and increase the hit/miss
+performance of the requests.
 
-| String input           | Action                                                          |
-|:----------------------:|:---------------------------------------------------------------:|
-| a: metallica t: master | Explicitly write the Artist and the Track (partially is allowed)|
-| a: metallica           | Only pass the author                                            |
-| t: master of puppets   | Only the track                                                  |
-| master of              | If no identifier is given, the request will use a free Track search|
 
-Press TAB in Helm to see Actions over it.
+Example of query strings using **keywords**:
+
+| Input                  | Action                                                              |
+|:----------------------:|:-------------------------------------------------------------------:|
+| a: metallica t: master | Explicitly write the Artist and the Track (partially is allowed)    |
+| a: metallica           | Only pass the author                                                |
+| t: master of puppets   | Only the track                                                      |
+| master of              | If no identifier is given, the request will use a free Track search |
+| a: john m: US          | **m** informs the *market region* (it can be used in any search)    |
+
+Press TAB in Helm to see Actions over it as well.
 
 # More features
 
-As there are no downside of adding quick IBUS control over Emacs there are some small commands such as *spotify-pause, spotify-play, spotify-next* which can be called from M-x.
+As there are no downsides for adding quick DBUS control over Spotify from Emacs, there are some small commands such as
+*helm-spotify-plus-pause, helm-spotify-plus-play, helm-spotify-plus-next* available from M-x.
 
 # Some already fixed bugs
+
 + Helm-spotify works when your buffer is visiting a remote machine.
 + Encoding
 + Difficulty to interact with Spotify API directly through Helm interface
 + Album play was only playing the first song of the album. Now its fixed.
+
 
 # Credits
 
 The original script was created by Kris Jenkis in 2013.
 
 
+# Contributions
 
+Any contribution is very welcome! Request of features, bug reports and documentation. Just drop us a line using the
+Github issues feature.
