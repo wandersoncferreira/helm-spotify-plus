@@ -48,10 +48,10 @@ Example of query strings using **keywords**:
 
 | Input                  | Action                                                              |
 |:----------------------:|:-------------------------------------------------------------------:|
-| a: metallica t: master | Explicitly write the Artist and the Track (partially is allowed)    |
+| master of              | If no identifier is given, the request will use a free Track search |
 | a: metallica           | Only pass the author                                                |
 | t: master of puppets   | Only the track                                                      |
-| master of              | If no identifier is given, the request will use a free Track search |
+| a: metallica t: master | Explicitly write the Artist and the Track (partially is allowed)    |
 | a: john m: US          | **m** informs the *market region* (it can be used in any search)    |
 
 Press TAB in Helm to see Actions over it as well.
@@ -64,10 +64,10 @@ As there are no downsides for adding quick DBUS control over Spotify from Emacs,
 # Some already fixed bugs
 
 + Helm-spotify works when your buffer is visiting a remote machine.
-+ Encoding
-+ Difficulty to interact with Spotify API directly through Helm interface
++ Encoding.
++ Difficulty to interact with Spotify API directly through Helm interface.
 + Album play was only playing the first song of the album. Now its fixed.
-
++ Artist **a:** keyword indeed filters the result to match artist field.
 
 # Credits
 

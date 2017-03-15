@@ -178,7 +178,7 @@
      ((and (string-match "a:" search-term) (string-match "t:" search-term)) ;both the artist and track name are available
       (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
              (track-name (helm-spotify-plus-split-string "t" search-term))
-             (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&%s&type=artist&limit=%s&offset=%d"
+             (new-url (format "https://api.spotify.com/v1/search?q=%s artist:%s&type=track&limit=%s&offset=%d"
                               track-name artist-name helm-spotify-plus-limit offset)))
         (if helm-spotify-plus-market-region
             (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
