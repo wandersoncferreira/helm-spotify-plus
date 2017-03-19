@@ -69,6 +69,15 @@ As there are no downsides for adding quick DBUS control over Spotify from Emacs,
 + Album play was only playing the first song of the album. Now its fixed.
 + Artist **a:** keyword indeed filters the result to match artist field.
 
+# Recommended keybindings
+```emacs-lisp
+(global-set-key (kbd "C-c s s") 'helm-spotify-plus)  ;; s for SEARCH
+(global-set-key (kbd "C-c s f") 'helm-spotify-plus-next)
+(global-set-key (kbd "C-c s b") 'helm-spotify-plus-previous)
+(global-set-key (kbd "C-c s p") 'helm-spotify-plus-play) 
+(global-set-key (kbd "C-c s g") 'helm-spotify-plus-pause) ;; g cause you know.. C-g stop things :)
+```
+
 # Credits
 
 The original script was created by Kris Jenkis in 2013.
