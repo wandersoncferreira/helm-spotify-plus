@@ -169,6 +169,25 @@
 ;; End of spotify controllers definition. ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar helm-spotify-plus-spotify-api-authentication-url "https://accounts.spotify.com/api/token")
+(defvar helm-spotify-plus-client-key "515f0ff545a349bcadf98efab945972f")
+(defvar helm-spotify-plus-client-secret "7618bf445df14b568782b13e37cf63e6")
+
+(defun helm-spotify-plus-get-token ()
+  "Get the token for the `helm-spotify-plus' Web App."
+  (let ((url-request-method "POST")
+        (url-request-data "&grant_type=client_credentials")
+        (url-request-extra-headers
+         `(("Content-Type" . "application/x-www-form-urlencoded")
+           ("Authorization" . ,(concat "Basic " (base64-encode-string (concat helm-spotify-plus-client-key ":" helm-spotify-plus-client-secret) t))))))
+    (with-current-buffer
+        (url-retrieve-synchronously helm-spotify-plus-spotify-api-authentication-url)
+      (goto-char url-http-end-of-headers)
+      (let* ((response (json-read))
+             (token-type (alist-get 'token_type response))
+             (token (alist-get 'access_token response)))
+        (cons token-type token)))))
+
 (defmulti-method helm-spotify-plus-play-href 'windows-nt
   (href)
   (shell-command (format "explorer %S" href)))
@@ -180,7 +199,6 @@
 (defun helm-spotify-plus-play-track (track)
   "Get the Spotify app to play the TRACK."
   (helm-spotify-plus-play-href (helm-spotify-plus-alist-get '(uri) track)))
-
 
 
 (defun helm-spotify-plus-play-album (track)
@@ -269,10 +287,14 @@
 
 (defun helm-spotify-plus-request (a-url)
   "Function to request an json given a correct A-URL."
-  (with-current-buffer
-      (url-retrieve-synchronously a-url)
-    (goto-char url-http-end-of-headers)
-    (json-read)))
+  (let* ((token (helm-spotify-plus-get-token))
+         (access-token (cdr token))
+         (url-request-extra-headers
+          `(("Authorization" . ,(concat "Bearer " access-token)))))
+    (with-current-buffer
+        (url-retrieve-synchronously a-url)
+      (goto-char url-http-end-of-headers)
+      (json-read))))
 
 (defun helm-spotify-plus-decode-utf8 (string)
   "Function to decode the STRING due to the errors in some symbols."
