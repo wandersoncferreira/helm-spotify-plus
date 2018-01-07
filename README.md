@@ -29,6 +29,13 @@ git clone submodule add https://github.com/wandersoncferreira/helm-spotify-plus
     + [Helm](https://github.com/emacs-helm/helm)
     + [Multi](https://github.com/kurisuwhyte/emacs-multi)
 
+# Spotify Web API request client ID
+
+Since the change from Spotify API there are some bugs with this package (https://developer.spotify.com/news-stories/2017/01/27/removing-unauthenticated-calls-to-the-web-api/).
+However, I fixed the problem by exposing the client ID and secret from this web app only, which I don't see as a major problem due to the nature of our requests. I don't need to use any private data from Spotify, so I don't see why I should bother you to go there and make your own Client ID and Secrets.
+
+The current state of this package is fully functional and has zero impact on the previous user experience. Everything should be working as expected. If you have any point to discuss about this topic, plase I would love to hear from you. Thanks and sorry for taking so long to fix it.
+
 # How to use it
 
 There are one basic command *helm-spotify-plus* that will ask you for an input string:
