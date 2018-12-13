@@ -102,15 +102,17 @@
 (defun helm-spotify-plus-next ()
   "Play the next song."
   (interactive)
-  (cond
-   ((eq system-type 'gnu/linux)
-    (helm-spotify-plus-action "Next"))
-   ((eq system-type 'darwin)
-    (helm-spotify-plus-action-darwin "next track"))
-   ((eq system-type 'windows-nt)
-    (message "Sorry, there is no support for Windows yet"))
-   (t
-    (message "Sorry, there is no support for your OS yet."))))
+  (if spotify-queue
+      (helm-spotify-plus-queue-play-next)
+    (cond
+     ((eq system-type 'gnu/linux)
+      (helm-spotify-plus-action "Next"))
+     ((eq system-type 'darwin)
+      (helm-spotify-plus-action-darwin "next track"))
+     ((eq system-type 'windows-nt)
+      (message "Sorry, there is no support for Windows yet"))
+     (t
+      (message "Sorry, there is no support for your OS yet.")))))
 
 (defun helm-spotify-plus-pause ()
   "Pause the current song."
@@ -168,6 +170,72 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End of spotify controllers definition. ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Queue functionality ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defvar helm-spotify-queue-song-end-soft-limit
+  300
+  "How much time in milliseconds till end of track before skipping to next track in the queue.
+This is so spotify doesn't start a new song in the small delay of communication.")
+
+(setq spotify-queue nil)
+(setq spotify-queue-timer nil)
+
+(defun helm-spotify-plus-queue-play-next ()
+  "Play next TRACK in the queue"
+  (setq spotify-queue (cdr spotify-queue))
+  (helm-spotify-plus-play-track (car spotify-queue))
+  (helm-spotify-plus-queue-runner)
+  )
+
+(defun helm-spotify-plus-queue-runner ()
+  "Sets up the timer for the next TRACK to play in the queue."
+  (when spotify-queue
+    (let ((current_track (car spotify-queue)))
+      (setq spotify-queue-timer (run-at-time
+                                 (format "%d millisec" (- (alist-get 'duration_ms current_track) helm-spotify-queue-song-end-soft-limit))
+                                 nil
+                                 'helm-spotify-plus-queue-play-next))
+      )))
+
+(defun helm-spotify-plus-queue-add-track (track)
+  "Add the TRACK to the queue"
+  (if spotify-queue
+      (add-to-list 'spotify-queue track t)
+    (progn
+      (setq spotify-queue (list track))
+      (helm-spotify-plus-play-track track)
+      (helm-spotify-plus-queue-runner)))
+  )
+
+(defun helm-spotify-plus-queue-play-track-wrapper (track)
+  "Wrapper for `helm-spotify-plus-play-track' to correctly go ahead of the queue."
+  (when spotify-queue-timer
+    (cancel-timer spotify-queue-timer))
+
+  (if spotify-queue
+      (progn
+        (setq spotify-queue (cdr spotify-queue)) ; remove the interrupted track from the queue
+        (add-to-list 'spotify-queue track) ; add the "play now" track to the front of the queue
+        )
+    (setq spotify-queue (list track)))
+
+  (helm-spotify-plus-play-track track)
+  (helm-spotify-plus-queue-runner))
+
+(defun helm-spotify-plus-queue-play-album-wrapper (track)
+  "Wrapper for `helm-spotify-plus-play-album' to stop queue-playing."
+  (when spotify-queue-timer
+    (cancel-timer spotify-queue-timer))
+  (setq spotify-queue nil)
+  (helm-spotify-plus-play-album track))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; End of queue functionality. ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defvar helm-spotify-plus-spotify-api-authentication-url "https://accounts.spotify.com/api/token")
 (defvar helm-spotify-plus-client-key "515f0ff545a349bcadf98efab945972f")
@@ -323,8 +391,9 @@
 
 (defun helm-spotify-plus-actions-for-track (actions track)
   "Return a list of helm ACTIONS available for this TRACK."
-  `((,(format "Play Track - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))       . helm-spotify-plus-play-track)
-    (,(format "Play Album - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(album name) track))) . helm-spotify-plus-play-album)
+  `((,(format "Play Track - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))       . helm-spotify-plus-queue-play-track-wrapper)
+    (,(format "Play Album - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(album name) track))) . helm-spotify-plus-queue-play-album-wrapper)
+    (,(format "Queue Track - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))      . helm-spotify-plus-queue-add-track)
     ("Show Track Metadata" . pp)))
 
 
