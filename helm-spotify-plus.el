@@ -389,7 +389,7 @@ This is so spotify doesn't start a new song due to mismatch in time.")
   "Return a list of helm ACTIONS available for this TRACK."
   `((,(format "Play Track - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))       . helm-spotify-plus-queue-play-track-wrapper)
     (,(format "Play Album - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(album name) track))) . helm-spotify-plus-queue-play-album-wrapper)
-    (,(format (if spotify-queue "Queue Track - %s" "Start play-queue with - %s") (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))      . helm-spotify-plus-queue-add-track)
+    (,(format "Queue Track - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))      . helm-spotify-plus-queue-add-track)
     ("Show Track Metadata" . pp)))
 
 
