@@ -50,12 +50,12 @@
   "Variable to control the number of pages of the requests.  5 pages with 50 candidates each, therefore there will be 250 candidates in your buffer."
   :type 'integer :group 'helm-spotify-plus)
 
-      
+
 (defun helm-spotify-plus-alist-get (symbols alist)
   "Look up the value for the chain of SYMBOLS in ALIST."
   (if symbols
       (helm-spotify-plus-alist-get (cdr symbols)
-		 (assoc (car symbols) alist))
+                 (assoc (car symbols) alist))
     (cdr alist)))
 
 (defmulti helm-spotify-plus-play-href (href)
@@ -65,8 +65,8 @@
 (defmulti-method helm-spotify-plus-play-href 'darwin
   (href)
   (shell-command (format "osascript -e 'tell application %S to play track %S'"
-			 "Spotify"
-			 href)))
+                         "Spotify"
+                         href)))
 
 (defvar helm-spotify-plus-dbus-call "dbus-send  --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 "
   "Variable to hold the dbus call string.")
@@ -75,12 +75,12 @@
   (href)
   (if helm-spotify-plus-dbus-prefer-local
       (progn
-	(call-process "/bin/bash" nil nil nil "-c" (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
-	(call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
-			 href)))
+        (call-process "/bin/bash" nil nil nil "-c" (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
+        (call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
+                         href)))
     (shell-command (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
     (shell-command (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
-			 href))))
+                         href))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -175,58 +175,58 @@
 ;; Queue functionality ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-(defvar helm-spotify-queue-song-end-soft-limit
-  300
+(defcustom helm-spotify-queue-song-end-soft-limit 300
   "Time in milliseconds for preemptive skip to next queued track.
-This is so spotify doesn't start a new song due to mismatch in time.")
+This is so spotify doesn't start a new song due to mismatch in time."
+  :type 'integer :group 'helm-spotify-plus)
 
-(setq spotify-queue nil)
-(setq spotify-queue-timer nil)
+(defvar helm-spotify-plus-queue nil)
+(defvar helm-spotify-plus-queue-timer nil)
 
 (defun helm-spotify-plus-queue-track-finished ()
-  "Called when track finished according to queue timer. Can be called to skip to next song in queue."
-  (setq spotify-queue (cdr spotify-queue))
+  "Called when track finished according to queue timer.
+Can be called to skip to next song in queue."
+  (setq helm-spotify-plus-queue (cdr helm-spotify-plus-queue))
   (helm-spotify-plus-queue-play-next))
 
 (defun helm-spotify-plus-queue-play-next ()
-  "Play next TRACK in the queue"
-  (when spotify-queue-timer
-    (cancel-timer spotify-queue-timer)
-    (setq spotify-queue-timer nil))
-  
-  (when spotify-queue
-    (let ((current-track (car spotify-queue)))
+  "Play next TRACK in the queue."
+  (when helm-spotify-plus-queue-timer
+    (cancel-timer helm-spotify-plus-queue-timer)
+    (setq helm-spotify-plus-queue-timer nil))
+
+  (when helm-spotify-plus-queue
+    (let ((current-track (car helm-spotify-plus-queue)))
       (helm-spotify-plus-play-track current-track)
-      (setq spotify-queue-timer (run-at-time
+      (setq helm-spotify-plus-queue-timer (run-at-time
                                  (format "%d millisec" (- (alist-get 'duration_ms current-track) helm-spotify-queue-song-end-soft-limit))
                                  nil
                                  'helm-spotify-plus-queue-track-finished)))))
 
 (defun helm-spotify-plus-queue-add-track (track)
-  "Add the TRACK to the queue"
-  (if spotify-queue
-      (add-to-list 'spotify-queue track t)
+  "Add the TRACK to the queue."
+  (if helm-spotify-plus-queue
+      (add-to-list 'helm-spotify-plus-queue track t)
     (progn
-      (setq spotify-queue (list track))
+      (setq helm-spotify-plus-queue (list track))
       (helm-spotify-plus-queue-play-next))))
 
 (defun helm-spotify-plus-queue-play-track-wrapper (track)
-  "Wrapper for `helm-spotify-plus-play-track' to correctly go ahead of the queue."
-  (if spotify-queue
+  "Wrapper for `helm-spotify-plus-play-track' to correctly go ahead of the queue and play the TRACK."
+  (if helm-spotify-plus-queue
       (progn
-        (setq spotify-queue (cdr spotify-queue)) ; remove the interrupted track from the queue
-        (add-to-list 'spotify-queue track)) ; add the "play now" track to the front of the queue
-    (setq spotify-queue (list track)))
+        (setq helm-spotify-plus-queue (cdr helm-spotify-plus-queue)) ; remove the interrupted track from the queue
+        (add-to-list 'helm-spotify-plus-queue track)) ; add the "play now" track to the front of the queue
+    (setq helm-spotify-plus-queue (list track)))
 
   (helm-spotify-plus-queue-play-next))
 
 (defun helm-spotify-plus-queue-play-album-wrapper (track)
-  "Wrapper for `helm-spotify-plus-play-album' to stop queue-playing."
-  (when spotify-queue-timer
-    (cancel-timer spotify-queue-timer)
-    (setq spotify-queue-timer nil))
-  (setq spotify-queue nil)
+  "Wrapper for `helm-spotify-plus-play-album' to stop queue-playing and play a TRACK."
+  (when helm-spotify-plus-queue-timer
+    (cancel-timer helm-spotify-plus-queue-timer)
+    (setq helm-spotify-plus-queue-timer nil))
+  (setq helm-spotify-plus-queue nil)
   (helm-spotify-plus-play-album track))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -302,7 +302,7 @@ This is so spotify doesn't start a new song due to mismatch in time.")
         (market-region (helm-spotify-plus-split-string "m" search-term))
         (url-default "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d"))
     (cond
-     
+
      ((and (string-match "a:" search-term) (string-match "t:" search-term)) ;both the artist and track name are available
       (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
              (track-name (helm-spotify-plus-split-string "t" search-term))
@@ -311,7 +311,7 @@ This is so spotify doesn't start a new song due to mismatch in time.")
         (if helm-spotify-plus-market-region
             (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
           (helm-spotify-plus-request new-url))))
-          
+
      ((string-match "a:" search-term)	;only the artist name was given
       (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
              (new-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=%s&offset=%d" artist-name
@@ -319,7 +319,7 @@ This is so spotify doesn't start a new song due to mismatch in time.")
         (if helm-spotify-plus-market-region
             (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
           (helm-spotify-plus-request new-url))))
-     
+
      ((string-match "t:" search-term)	; only the track name was given
       (let* ((track-name (helm-spotify-plus-split-string "t" search-term))
             (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" track-name
@@ -327,7 +327,7 @@ This is so spotify doesn't start a new song due to mismatch in time.")
         (if helm-spotify-plus-market-region
             (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
           (helm-spotify-plus-request new-url))))
-     
+
      (t					;Else case... do a regular search for the track name
       (if helm-spotify-plus-market-region
           (if (string-match "m:" search-term)
@@ -338,7 +338,7 @@ This is so spotify doesn't start a new song due to mismatch in time.")
             (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url (format url-default search-term
                                                                                            helm-spotify-plus-limit offset) market-region)))
         (helm-spotify-plus-request (format url-default search-term helm-spotify-plus-limit offset)))))))
-            
+
 
 (defun helm-spotify-plus-split-string (letter search-term)
   "Function to split based in the LETTER using the SEARCH-TERM."
@@ -368,16 +368,16 @@ This is so spotify doesn't start a new song due to mismatch in time.")
 (defun helm-spotify-plus-format-track (track)
   "Given a TRACK, return a a formatted string suitable for display."
   (let ((track-name   (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))
-	(track-length (/ (helm-spotify-plus-alist-get '(duration_ms) track) 1000))
-	(album-name  (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(album name) track)))
-	(artist-names (mapcar (lambda (artist)
-				(helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) artist)))
-			      (helm-spotify-plus-alist-get '(artists) track))))
+        (track-length (/ (helm-spotify-plus-alist-get '(duration_ms) track) 1000))
+        (album-name  (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(album name) track)))
+        (artist-names (mapcar (lambda (artist)
+                                (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) artist)))
+                              (helm-spotify-plus-alist-get '(artists) track))))
     (format "%s (%dm%0.2ds)\n%s - %s"
-	    track-name
-	    (/ track-length 60) (mod track-length 60)
-	    (mapconcat 'identity artist-names "/")
-	    album-name)))
+            track-name
+            (/ track-length 60) (mod track-length 60)
+            (mapconcat 'identity artist-names "/")
+            album-name)))
 
 
 (defun helm-spotify-plus-search (search-term)
@@ -402,12 +402,12 @@ This is so spotify doesn't start a new song due to mismatch in time.")
   "Brind up a custom PROMPT asking for the name of the Artist to perform the search and them all the candidates ready to be narrowed."
   (interactive)
   (helm :sources (helm-build-sync-source "Spotify"
-		   :init (setq search-string (helm-spotify-plus-get-search-string))
-		   :candidates (helm-spotify-plus-search search-string)
-		   :multiline t
-		   :action-transformer
-		   (lambda (actions track)
-		     (helm-spotify-plus-actions-for-track actions track)))
+                   :init (setq search-string (helm-spotify-plus-get-search-string))
+                   :candidates (helm-spotify-plus-search search-string)
+                   :multiline t
+                   :action-transformer
+                   (lambda (actions track)
+                     (helm-spotify-plus-actions-for-track actions track)))
         :buffer "*helm-spotify*"))
 
 (provide 'helm-spotify-plus)
