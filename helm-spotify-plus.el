@@ -396,7 +396,7 @@ Can be called to skip to next song in queue."
   "Return a list of helm ACTIONS available for this TRACK."
   `((,(format "Play Track - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))       . helm-spotify-plus-queue-play-track-wrapper)
     (,(format "Play Album - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(album name) track))) . helm-spotify-plus-queue-play-album-wrapper)
-    (,(format "Queue Track - %s" (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))      . helm-spotify-plus-queue-add-track)
+    (,(format (if helm-spotify-plus-queue "Queue Track - %s" "Start Queue Playing - %s") (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))      . helm-spotify-plus-queue-add-track)
     ("Show Track Metadata" . pp)))
 
 
