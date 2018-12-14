@@ -175,58 +175,58 @@
 ;; Queue functionality ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-(defvar helm-spotify-queue-song-end-soft-limit
-  300
+(defcustom helm-spotify-queue-song-end-soft-limit 300
   "Time in milliseconds for preemptive skip to next queued track.
-This is so spotify doesn't start a new song due to mismatch in time.")
+This is so spotify doesn't start a new song due to mismatch in time."
+  :type 'integer :group 'helm-spotify-plus)
 
-(setq spotify-queue nil)
-(setq spotify-queue-timer nil)
+(defvar helm-spotify-plus-queue nil)
+(defvar helm-spotify-plus-queue-timer nil)
 
 (defun helm-spotify-plus-queue-track-finished ()
-  "Called when track finished according to queue timer. Can be called to skip to next song in queue."
-  (setq spotify-queue (cdr spotify-queue))
+  "Called when track finished according to queue timer.
+Can be called to skip to next song in queue."
+  (setq helm-spotify-plus-queue (cdr helm-spotify-plus-queue))
   (helm-spotify-plus-queue-play-next))
 
 (defun helm-spotify-plus-queue-play-next ()
-  "Play next TRACK in the queue"
-  (when spotify-queue-timer
-    (cancel-timer spotify-queue-timer)
-    (setq spotify-queue-timer nil))
+  "Play next TRACK in the queue."
+  (when helm-spotify-plus-queue-timer
+    (cancel-timer helm-spotify-plus-queue-timer)
+    (setq helm-spotify-plus-queue-timer nil))
 
-  (when spotify-queue
-    (let ((current-track (car spotify-queue)))
+  (when helm-spotify-plus-queue
+    (let ((current-track (car helm-spotify-plus-queue)))
       (helm-spotify-plus-play-track current-track)
-      (setq spotify-queue-timer (run-at-time
+      (setq helm-spotify-plus-queue-timer (run-at-time
                                  (format "%d millisec" (- (alist-get 'duration_ms current-track) helm-spotify-queue-song-end-soft-limit))
                                  nil
                                  'helm-spotify-plus-queue-track-finished)))))
 
 (defun helm-spotify-plus-queue-add-track (track)
-  "Add the TRACK to the queue"
-  (if spotify-queue
-      (add-to-list 'spotify-queue track t)
+  "Add the TRACK to the queue."
+  (if helm-spotify-plus-queue
+      (add-to-list 'helm-spotify-plus-queue track t)
     (progn
-      (setq spotify-queue (list track))
+      (setq helm-spotify-plus-queue (list track))
       (helm-spotify-plus-queue-play-next))))
 
 (defun helm-spotify-plus-queue-play-track-wrapper (track)
-  "Wrapper for `helm-spotify-plus-play-track' to correctly go ahead of the queue."
-  (if spotify-queue
+  "Wrapper for `helm-spotify-plus-play-track' to correctly go ahead of the queue and play the TRACK."
+  (if helm-spotify-plus-queue
       (progn
-        (setq spotify-queue (cdr spotify-queue)) ; remove the interrupted track from the queue
-        (add-to-list 'spotify-queue track)) ; add the "play now" track to the front of the queue
-    (setq spotify-queue (list track)))
+        (setq helm-spotify-plus-queue (cdr helm-spotify-plus-queue)) ; remove the interrupted track from the queue
+        (add-to-list 'helm-spotify-plus-queue track)) ; add the "play now" track to the front of the queue
+    (setq helm-spotify-plus-queue (list track)))
 
   (helm-spotify-plus-queue-play-next))
 
 (defun helm-spotify-plus-queue-play-album-wrapper (track)
-  "Wrapper for `helm-spotify-plus-play-album' to stop queue-playing."
-  (when spotify-queue-timer
-    (cancel-timer spotify-queue-timer)
-    (setq spotify-queue-timer nil))
-  (setq spotify-queue nil)
+  "Wrapper for `helm-spotify-plus-play-album' to stop queue-playing and play a TRACK."
+  (when helm-spotify-plus-queue-timer
+    (cancel-timer helm-spotify-plus-queue-timer)
+    (setq helm-spotify-plus-queue-timer nil))
+  (setq helm-spotify-plus-queue nil)
   (helm-spotify-plus-play-album track))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
