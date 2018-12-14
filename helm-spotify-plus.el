@@ -117,7 +117,7 @@
 (defun helm-spotify-plus-pause ()
   "Pause the current song."
   (interactive)
-  (helm-spotify-plus-stop-queue-playing)
+  (helm-spotify-plus-queue-stop)
   (cond
    ((eq system-type 'gnu/linux)
     (helm-spotify-plus-action "Pause"))
@@ -131,7 +131,7 @@
 (defun helm-spotify-plus-play ()
   "Play a song."
   (interactive)
-  (helm-spotify-plus-stop-queue-playing)
+  (helm-spotify-plus-queue-stop)
   (cond
    ((eq system-type 'gnu/linux)
     (helm-spotify-plus-action "Play"))
@@ -145,7 +145,7 @@
 (defun helm-spotify-plus-previous ()
   "Plays previous song."
   (interactive)
-  (helm-spotify-plus-stop-queue-playing)
+  (helm-spotify-plus-queue-stop)
   (cond
    ((eq system-type 'gnu/linux)
     (helm-spotify-plus-action "Previous"))
@@ -190,9 +190,9 @@ This is so spotify doesn't start a new song due to mismatch in time."
   "Called when track finished according to queue timer.
 Can be called to skip to next song in queue."
   (setq helm-spotify-plus-queue (cdr helm-spotify-plus-queue))
-  (helm-spotify-plus-queue-play-next))
+  (helm-spotify-plus-queue-play-queue))
 
-(defun helm-spotify-plus-queue-play-next ()
+(defun helm-spotify-plus-queue-play-queue ()
   "Play next TRACK in the queue."
   (when helm-spotify-plus-queue-timer
     (cancel-timer helm-spotify-plus-queue-timer)
@@ -206,7 +206,7 @@ Can be called to skip to next song in queue."
                                  nil
                                  'helm-spotify-plus-queue-track-finished)))))
 
-(defun helm-spotify-plus-stop-queue-playing ()
+(defun helm-spotify-plus-queue-stop ()
   "Stops the `helm-spotify-plus-queue-timer' and empties the `helm-spotify-plus-queue'"
   (when helm-spotify-plus-queue-timer
     (cancel-timer helm-spotify-plus-queue-timer)
@@ -219,7 +219,7 @@ Can be called to skip to next song in queue."
       (add-to-list 'helm-spotify-plus-queue track t)
     (progn
       (setq helm-spotify-plus-queue (list track))
-      (helm-spotify-plus-queue-play-next))))
+      (helm-spotify-plus-queue-play-queue))))
 
 (defun helm-spotify-plus-queue-play-track-wrapper (track)
   "Wrapper for `helm-spotify-plus-play-track' to correctly go ahead of the queue and play the TRACK."
@@ -229,11 +229,11 @@ Can be called to skip to next song in queue."
         (add-to-list 'helm-spotify-plus-queue track)) ; add the "play now" track to the front of the queue
     (setq helm-spotify-plus-queue (list track)))
 
-  (helm-spotify-plus-queue-play-next))
+  (helm-spotify-plus-queue-play-queue))
 
 (defun helm-spotify-plus-queue-play-album-wrapper (track)
   "Wrapper for `helm-spotify-plus-play-album' to stop queue-playing and play a TRACK."
-  (helm-spotify-plus-stop-queue-playing)
+  (helm-spotify-plus-queue-stop)
   (helm-spotify-plus-play-album track))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
