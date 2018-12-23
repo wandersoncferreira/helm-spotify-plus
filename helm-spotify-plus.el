@@ -87,7 +87,21 @@
 ;; Spotify controllers ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun helm-spotify-plus-action (action)
+(defvar helm-spotify-plus-action-hashtable #s(hash-table
+					      size 20
+					      test equal
+					      data (
+						    "play-unix" "Play"
+						    "play-darwin" "play track"
+						    "next-unix" "Next"
+						    "next-darwin" "next track"
+						    "pause-unix" "Pause"
+						    "pause-darwin" "pause"
+						    "previous-unix" "Previous"
+						    "previous-darwin" "previous track"
+						    "playpause-unix" "PlayPause"
+						    "playpause-darwin" "playpause")))
+(defun helm-spotify-plus-action-unix (action)
   "Send a given ACTION to dbus."
   (if helm-spotify-plus-dbus-prefer-local
       (call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.%s") action))
@@ -95,80 +109,52 @@
      (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.%s") action))))
 
 (defun helm-spotify-plus-action-darwin (action)
-  "Send a given ACTION to osascript such as PLAY, PAUSE, NEXT"
+  "Send a given ACTION to osascript such as PLAY, PAUSE, NEXT."
   (let ((action-string (format "osascript -e 'tell application \"Spotify\" to %s'" action)))
     (shell-command action-string)))
+
+(defun helm-spotify-plus-action (action)
+  "Execute the proper ACTION in the correct environment."
+  (interactive)
+  (cond
+   ((eq system-type 'gnu/linux)
+    (helm-spotify-plus-action-unix
+     (gethash (format "%s-unix" action) helm-spotify-plus-action-hashtable)))
+   ((eq system-type 'darwin)
+    (helm-spotify-plus-action-darwin
+     (gethash (format "%s-darwin" action) helm-spotify-plus-action-hashtable)))
+   (t
+    (message "Sorry, there is no support for your OS yet."))))
 
 (defun helm-spotify-plus-next ()
   "Play the next song."
   (interactive)
   (if (equal (length helm-spotify-plus-queue) 2)
       (helm-spotify-plus-queue-track-finished)
-    (cond
-     ((eq system-type 'gnu/linux)
-      (helm-spotify-plus-action "Next"))
-     ((eq system-type 'darwin)
-      (helm-spotify-plus-action-darwin "next track"))
-     ((eq system-type 'windows-nt)
-      (message "Sorry, there is no support for Windows yet"))
-     (t
-      (message "Sorry, there is no support for your OS yet.")))))
+    (helm-spotify-plus-action "next")))
 
 (defun helm-spotify-plus-pause ()
   "Pause the current song."
   (interactive)
   (helm-spotify-plus-queue-stop)
-  (cond
-   ((eq system-type 'gnu/linux)
-    (helm-spotify-plus-action "Pause"))
-   ((eq system-type 'darwin)
-    (helm-spotify-plus-action-darwin "pause"))
-   ((eq system-type 'windows-nt)
-    (message "Sorry, there is no support for Windows yet"))
-   (t
-    (message "Sorry, there is no support for your OS yet."))))
+  (helm-spotify-plus-action "pause"))
 
 (defun helm-spotify-plus-play ()
   "Play a song."
   (interactive)
   (helm-spotify-plus-queue-stop)
-  (cond
-   ((eq system-type 'gnu/linux)
-    (helm-spotify-plus-action "Play"))
-   ((eq system-type 'darwin)
-    (helm-spotify-plus-action-darwin "play track"))
-   ((eq system-type 'windows-nt)
-    (message "Sorry, there is no support for Windows yet"))
-   (t
-    (message "Sorry, there is no support for your OS yet."))))
+  (helm-spotify-plus-action "play"))
 
 (defun helm-spotify-plus-previous ()
   "Plays previous song."
   (interactive)
   (helm-spotify-plus-queue-stop)
-  (cond
-   ((eq system-type 'gnu/linux)
-    (helm-spotify-plus-action "Previous"))
-   ((eq system-type 'darwin)
-    (helm-spotify-plus-action-darwin "previous track"))
-   ((eq system-type 'windows-nt)
-    (message "Sorry, there is no support for Windows yet"))
-   (t
-    (message "Sorry, there is no support for your OS yet."))))
-
+  (helm-spotify-plus-action "previous"))
 
 (defun helm-spotify-plus-toggle-play-pause ()
   "Toggle between play and pause song."
   (interactive)
-  (cond
-   ((eq system-type 'gnu/linux)
-    (helm-spotify-plus-action "PlayPause"))
-   ((eq system-type 'darwin)
-    (helm-spotify-plus-action-darwin "playpause"))
-   ((eq system-type 'windows-nt)
-    (message "Sorry, there is no support for Windows yet"))
-   (t
-    (message "Sorry, there is no support for your OS yet."))))
+  (helm-spotify-plus-action "playpause"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End of spotify controllers definition. ;;
