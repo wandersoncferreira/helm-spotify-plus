@@ -55,7 +55,7 @@
   "Look up the value for the chain of SYMBOLS in ALIST."
   (if symbols
       (helm-spotify-plus-alist-get (cdr symbols)
-                 (assoc (car symbols) alist))
+		 (assoc (car symbols) alist))
     (cdr alist)))
 
 (defmulti helm-spotify-plus-play-href (href)
@@ -65,8 +65,8 @@
 (defmulti-method helm-spotify-plus-play-href 'darwin
   (href)
   (shell-command (format "osascript -e 'tell application %S to play track %S'"
-                         "Spotify"
-                         href)))
+			 "Spotify"
+			 href)))
 
 (defvar helm-spotify-plus-dbus-call "dbus-send  --session --type=method_call --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 "
   "Variable to hold the dbus call string.")
@@ -75,12 +75,12 @@
   (href)
   (if helm-spotify-plus-dbus-prefer-local
       (progn
-        (call-process "/bin/bash" nil nil nil "-c" (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
-        (call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
-                         href)))
+	(call-process "/bin/bash" nil nil nil "-c" (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
+	(call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
+			 href)))
     (shell-command (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
     (shell-command (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
-                         href))))
+			 href))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -188,9 +188,9 @@ Can be called to skip to next song in queue."
     (let ((current-track (car helm-spotify-plus-queue)))
       (helm-spotify-plus-play-track current-track)
       (setq helm-spotify-plus-queue-timer (run-at-time
-                                 (format "%d millisec" (- (alist-get 'duration_ms current-track) helm-spotify-queue-song-end-soft-limit))
-                                 nil
-                                 'helm-spotify-plus-queue-track-finished)))))
+				 (format "%d millisec" (- (alist-get 'duration_ms current-track) helm-spotify-queue-song-end-soft-limit))
+				 nil
+				 'helm-spotify-plus-queue-track-finished)))))
 
 (defun helm-spotify-plus-queue-stop ()
   "Stops the `helm-spotify-plus-queue-timer' and empties the `helm-spotify-plus-queue'"
@@ -211,8 +211,8 @@ Can be called to skip to next song in queue."
   "Wrapper for `helm-spotify-plus-play-track' to correctly go ahead of the queue and play the TRACK."
   (if helm-spotify-plus-queue
       (progn
-        (setq helm-spotify-plus-queue (cdr helm-spotify-plus-queue)) ; remove the interrupted track from the queue
-        (add-to-list 'helm-spotify-plus-queue track)) ; add the "play now" track to the front of the queue
+	(setq helm-spotify-plus-queue (cdr helm-spotify-plus-queue)) ; remove the interrupted track from the queue
+	(add-to-list 'helm-spotify-plus-queue track)) ; add the "play now" track to the front of the queue
     (setq helm-spotify-plus-queue (list track)))
 
   (helm-spotify-plus-queue-play-queue))
@@ -233,17 +233,17 @@ Can be called to skip to next song in queue."
 (defun helm-spotify-plus-get-token ()
   "Get the token for the `helm-spotify-plus' Web App."
   (let ((url-request-method "POST")
-        (url-request-data "&grant_type=client_credentials")
-        (url-request-extra-headers
-         `(("Content-Type" . "application/x-www-form-urlencoded")
-           ("Authorization" . ,(concat "Basic " (base64-encode-string (concat helm-spotify-plus-client-key ":" helm-spotify-plus-client-secret) t))))))
+	(url-request-data "&grant_type=client_credentials")
+	(url-request-extra-headers
+	 `(("Content-Type" . "application/x-www-form-urlencoded")
+	   ("Authorization" . ,(concat "Basic " (base64-encode-string (concat helm-spotify-plus-client-key ":" helm-spotify-plus-client-secret) t))))))
     (with-current-buffer
-        (url-retrieve-synchronously helm-spotify-plus-spotify-api-authentication-url)
+	(url-retrieve-synchronously helm-spotify-plus-spotify-api-authentication-url)
       (goto-char url-http-end-of-headers)
       (let* ((response (json-read))
-             (token-type (alist-get 'token_type response))
-             (token (alist-get 'access_token response)))
-        (cons token-type token)))))
+	     (token-type (alist-get 'token_type response))
+	     (token (alist-get 'access_token response)))
+	(cons token-type token)))))
 
 (defmulti-method helm-spotify-plus-play-href 'windows-nt
   (href)
@@ -278,8 +278,8 @@ Can be called to skip to next song in queue."
 (defun helm-spotify-plus-search-formatted-helper (search-term counter)
   "Helper function to format the output due to SEARCH-TERM and COUNTER."
   (mapcar (lambda (track)
-            (cons (helm-spotify-plus-format-track track) track))
-          (helm-spotify-plus-alist-get '(tracks items) (helm-spotify-plus-artist-track-search search-term counter))))
+	    (cons (helm-spotify-plus-format-track track) track))
+	  (helm-spotify-plus-alist-get '(tracks items) (helm-spotify-plus-artist-track-search search-term counter))))
 
 (defun helm-spotify-plus-insert-market-region-url (new-url market-region)
   "Function to insert in the NEW-URL a value passed as MARKET-REGION."
@@ -292,64 +292,64 @@ Can be called to skip to next song in queue."
 (defun helm-spotify-plus-artist-track-search (search-term counter)
   "Function to get the current match between the SEARCH-TERM and amount of requests defined by COUNTER."
   (let ((offset (* helm-spotify-plus-limit counter))
-        (market-region (helm-spotify-plus-split-string "m" search-term))
-        (url-default "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d"))
+	(market-region (helm-spotify-plus-split-string "m" search-term))
+	(url-default "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d"))
     (cond
 
      ((and (string-match "a:" search-term) (string-match "t:" search-term)) ;both the artist and track name are available
       (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
-             (track-name (helm-spotify-plus-split-string "t" search-term))
-             (new-url (format "https://api.spotify.com/v1/search?q=%s artist:%s&type=track&limit=%s&offset=%d"
-                              track-name artist-name helm-spotify-plus-limit offset)))
-        (if helm-spotify-plus-market-region
-            (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
-          (helm-spotify-plus-request new-url))))
+	     (track-name (helm-spotify-plus-split-string "t" search-term))
+	     (new-url (format "https://api.spotify.com/v1/search?q=%s artist:%s&type=track&limit=%s&offset=%d"
+			      track-name artist-name helm-spotify-plus-limit offset)))
+	(if helm-spotify-plus-market-region
+	    (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
+	  (helm-spotify-plus-request new-url))))
 
      ((string-match "a:" search-term)	;only the artist name was given
       (let* ((artist-name (helm-spotify-plus-split-string "a" search-term))
-             (new-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=%s&offset=%d" artist-name
-                              helm-spotify-plus-limit offset)))
-        (if helm-spotify-plus-market-region
-            (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
-          (helm-spotify-plus-request new-url))))
+	     (new-url (format "https://api.spotify.com/v1/search?q=artist:%s&type=track&limit=%s&offset=%d" artist-name
+			      helm-spotify-plus-limit offset)))
+	(if helm-spotify-plus-market-region
+	    (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
+	  (helm-spotify-plus-request new-url))))
 
      ((string-match "t:" search-term)	; only the track name was given
       (let* ((track-name (helm-spotify-plus-split-string "t" search-term))
-            (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" track-name
-                             helm-spotify-plus-limit offset)))
-        (if helm-spotify-plus-market-region
-            (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
-          (helm-spotify-plus-request new-url))))
+	    (new-url (format "https://api.spotify.com/v1/search?q=%s&type=track&limit=%s&offset=%d" track-name
+			     helm-spotify-plus-limit offset)))
+	(if helm-spotify-plus-market-region
+	    (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url new-url market-region))
+	  (helm-spotify-plus-request new-url))))
 
      (t					;Else case... do a regular search for the track name
       (if helm-spotify-plus-market-region
-          (if (string-match "m:" search-term)
-              (let* ((search-term-filtered (string-trim (car (split-string search-term "m:"))))
-                     (new-url (format url-default search-term-filtered helm-spotify-plus-limit offset))
-                     (new-url-market (helm-spotify-plus-insert-market-region-url new-url market-region)))
-                (helm-spotify-plus-request new-url-market))
-            (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url (format url-default search-term
-                                                                                           helm-spotify-plus-limit offset) market-region)))
-        (helm-spotify-plus-request (format url-default search-term helm-spotify-plus-limit offset)))))))
+	  (if (string-match "m:" search-term)
+	      (let* ((search-term-filtered (string-trim (car (split-string search-term "m:"))))
+		     (new-url (format url-default search-term-filtered helm-spotify-plus-limit offset))
+		     (new-url-market (helm-spotify-plus-insert-market-region-url new-url market-region)))
+		(helm-spotify-plus-request new-url-market))
+	    (helm-spotify-plus-request (helm-spotify-plus-insert-market-region-url (format url-default search-term
+											   helm-spotify-plus-limit offset) market-region)))
+	(helm-spotify-plus-request (format url-default search-term helm-spotify-plus-limit offset)))))))
 
 
 (defun helm-spotify-plus-split-string (letter search-term)
   "Function to split based in the LETTER using the SEARCH-TERM."
   (if (string-match (format "%s:" letter) search-term)
       (let* ((delimiter (format ".*%s:" letter))
-             (name-tmp (car (cdr (split-string search-term delimiter))))
-             (name (car (split-string name-tmp " [a-z]:"))))
-        (string-trim name))
+	     (name-tmp (car (cdr (split-string search-term delimiter))))
+	     (name (car (split-string name-tmp " [a-z]:"))))
+	(string-trim name))
     nil))
 
 (defun helm-spotify-plus-request (a-url)
   "Function to request an json given a correct A-URL."
   (let* ((token (helm-spotify-plus-get-token))
-         (access-token (cdr token))
-         (url-request-extra-headers
-          `(("Authorization" . ,(concat "Bearer " access-token)))))
+	 (access-token (cdr token))
+	 (url-request-extra-headers
+	  `(("Authorization" . ,(concat "Bearer " access-token)))))
     (with-current-buffer
-        (url-retrieve-synchronously a-url)
+	(url-retrieve-synchronously a-url)
       (goto-char url-http-end-of-headers)
       (json-read))))
 
@@ -361,16 +361,16 @@ Can be called to skip to next song in queue."
 (defun helm-spotify-plus-format-track (track)
   "Given a TRACK, return a a formatted string suitable for display."
   (let ((track-name   (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) track)))
-        (track-length (/ (helm-spotify-plus-alist-get '(duration_ms) track) 1000))
-        (album-name  (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(album name) track)))
-        (artist-names (mapcar (lambda (artist)
-                                (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) artist)))
-                              (helm-spotify-plus-alist-get '(artists) track))))
+	(track-length (/ (helm-spotify-plus-alist-get '(duration_ms) track) 1000))
+	(album-name  (helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(album name) track)))
+	(artist-names (mapcar (lambda (artist)
+				(helm-spotify-plus-decode-utf8 (helm-spotify-plus-alist-get '(name) artist)))
+			      (helm-spotify-plus-alist-get '(artists) track))))
     (format "%s (%dm%0.2ds)\n%s - %s"
-            track-name
-            (/ track-length 60) (mod track-length 60)
-            (mapconcat 'identity artist-names "/")
-            album-name)))
+	    track-name
+	    (/ track-length 60) (mod track-length 60)
+	    (mapconcat 'identity artist-names "/")
+	    album-name)))
 
 
 (defun helm-spotify-plus-search (search-term)
@@ -395,13 +395,13 @@ Can be called to skip to next song in queue."
   "Brind up a custom PROMPT asking for the name of the Artist to perform the search and them all the candidates ready to be narrowed."
   (interactive)
   (helm :sources (helm-build-sync-source "Spotify"
-                   :init (setq search-string (helm-spotify-plus-get-search-string))
-                   :candidates (helm-spotify-plus-search search-string)
-                   :multiline t
-                   :action-transformer
-                   (lambda (actions track)
-                     (helm-spotify-plus-actions-for-track actions track)))
-        :buffer "*helm-spotify*"))
+		   :init (setq search-string (helm-spotify-plus-get-search-string))
+		   :candidates (helm-spotify-plus-search search-string)
+		   :multiline t
+		   :action-transformer
+		   (lambda (actions track)
+		     (helm-spotify-plus-actions-for-track actions track)))
+	:buffer "*helm-spotify*"))
 
 (provide 'helm-spotify-plus)
 
