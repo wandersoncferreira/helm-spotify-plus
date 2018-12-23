@@ -43,11 +43,13 @@
   :type 'string :group 'helm-spotify-plus)
 
 (defcustom helm-spotify-plus-market-region "US"
-  "Variable to define what is the default market region.  Nil values to disable this filter."
+  "Variable to define what is the default market region.
+Nil values to disable this filter."
   :type 'string :group 'helm-spotify-plus)
 
 (defcustom helm-spotify-plus-page-number 5
-  "Variable to control the number of pages of the requests.  5 pages with 50 candidates each, therefore there will be 250 candidates in your buffer."
+  "Variable to control the number of pages of the requests.
+5 pages with 50 candidates each, results in 250 candidates in your buffer."
   :type 'integer :group 'helm-spotify-plus)
 
 
