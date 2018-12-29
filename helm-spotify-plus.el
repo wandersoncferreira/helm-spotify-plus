@@ -102,7 +102,7 @@
 (defun helm-spotify-plus-next ()
   "Play the next song."
   (interactive)
-  (if (equal (length helm-spotify-plus-queue) 2)
+  (if (>= (length helm-spotify-plus-queue) 2)
       (helm-spotify-plus-queue-track-finished)
     (cond
      ((eq system-type 'gnu/linux)
