@@ -2,6 +2,7 @@
 
 ;; Copyright (C)
 ;; Author: Wanderson Ferreira <https://github.com/wandersoncferreira> and Luis Moneda <https://github.com/lgmoneda>
+;; Homepage: https://github.com/wandersoncferreira/helm-spotify-plus
 ;; Package: helm-spotify-plus
 ;; Package-Requires: ((emacs "24.4") (helm "2.0.0") (multi "2.0.1"))
 ;; Version: 0.1
