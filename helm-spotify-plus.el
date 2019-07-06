@@ -391,7 +391,7 @@ Can be called to skip to next song in queue."
 
 (defun helm-spotify-plus-get-search-string ()
   "Function to require an input string for the user."
-  (read-string "Enter the (partial/full) name of an Track: "))
+  (read-string "Enter the (partial/full) name of a track: "))
 
 ;;;###autoload
 (defun helm-spotify-plus ()
