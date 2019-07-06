@@ -1,21 +1,23 @@
+[![MELPA](https://melpa.org/packages/helm-spotify-plus-badge.svg)](https://melpa.org/#/helm-spotify-plus)
+
+
 # Helm Spotify Plus
 A search & play interface for Spotify
 
-There are several changes to the prior Helm-spotify package.
+There are several changes to the prior helm-spotify package.
 
-Helm is used here to only narrow the candidates we got from Spotify API requests.
+Helm is used here to narrow the candidates received from Spotify API requests.
 
 
 # How to install
-You can installed this package from [MELPA](https://melpa.org).
+You can install this package from [MELPA](https://melpa.org).
 
 ``` emacs-lisp
 M-x package-refresh-contents
 M-x package-install RET helm-spotify-plus
 ```
 
-If you prefer a manual installation.
-Clone the repo:
+If you prefer a manual installation you can clone the repo as follows:
 
 ```emacs-lisp
 cd ~/.emacs.d/site-packages
@@ -26,28 +28,32 @@ git clone submodule add https://github.com/wandersoncferreira/helm-spotify-plus
 (require 'helm-spotify-plus)
 ```
 ### Dependencies:
+It's important to have all the dependencies installed. If you choose to use the `use-package`, there's no need to worry with the dependencies.
+
     + [Helm](https://github.com/emacs-helm/helm)
     + [Multi](https://github.com/kurisuwhyte/emacs-multi)
 
+
 # Spotify Web API request client ID
 
-Since the change from Spotify API there are some bugs with this package (https://developer.spotify.com/news-stories/2017/01/27/removing-unauthenticated-calls-to-the-web-api/).
-However, I fixed the problem by exposing the client ID and secret from this web app only, which I don't see as a major problem due to the nature of our requests. I don't need to use any private data from Spotify, so I don't see why I should bother you to go there and make your own Client ID and Secrets.
+Since the change in Spotify API there were some bugs with this package (https://developer.spotify.com/news-stories/2017/01/27/removing-unauthenticated-calls-to-the-web-api/).
 
-The current state of this package is fully functional and has zero impact on the previous user experience. Everything should be working as expected. If you have any point to discuss about this topic, plase I would love to hear from you. Thanks and sorry for taking so long to fix it.
+However, I fixed the problem by exposing the client ID and secret from this web app inside Spotify environment, which I don't see as a major problem due to the nature of our requests. I don't need to use any private data from Spotify, so I don't see why I should bother **you** to go there and make your own **client ID** and **secrets**.
+
+The current state of this package is **fully functional** and has zero impact on the previous user experience. Everything should be working as expected. If you have any point to discuss about this topic, plase I would love to hear from you.
 
 # How to use it
 
-There are one basic command *helm-spotify-plus* that will ask you for an input string:
+There is one basic command *helm-spotify-plus* that will ask you for an input string:
 
 ```shell
-Enter the (partial/full) name of a Track/Artist:
+Enter the (partial/full) name of a track:
 ```
 
 A list of 250 candidates will popup using a Helm interface.
 
 
-There is also a concept of **keywords** which are tokens to explicitly organize your query and increase the hit/miss
+We also have the concept of **keywords** which are tokens to explicitly organize your query and increase the hit/miss
 performance of the requests.
 
 
@@ -65,7 +71,7 @@ Press TAB in Helm to see Actions over it as well.
 
 # More features
 
-As there are no downsides for adding quick DBUS control over Spotify from Emacs, there are some small commands such as
+As there are no downsides for adding quick DBUS control over Spotify from Emacs, we added some small commands such as
 *helm-spotify-plus-pause, helm-spotify-plus-play, helm-spotify-plus-next* available from M-x.
 
 # Some already fixed bugs
@@ -94,3 +100,5 @@ The original script was created by Kris Jenkis in 2013.
 
 Any contribution is very welcome! Request of features, bug reports and documentation. Just drop us a line using the
 Github issues feature.
+
+
