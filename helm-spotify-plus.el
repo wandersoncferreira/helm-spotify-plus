@@ -95,7 +95,7 @@ Nil values to disable this filter."
 					      test equal
 					      data (
 						    "play-unix" "Play"
-						    "play-darwin" "play track"
+						    "play-darwin" "play"
 						    "next-unix" "Next"
 						    "next-darwin" "next track"
 						    "pause-unix" "Pause"
