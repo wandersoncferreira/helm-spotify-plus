@@ -78,8 +78,8 @@ Nil values to disable this filter."
   (href)
   (if helm-spotify-plus-dbus-prefer-local
       (progn
-	(call-process "/bin/bash" nil nil nil "-c" (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
-	(call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
+	(call-process "/bin/sh" nil nil nil "-c" (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
+	(call-process "/bin/sh" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
 			 href)))
     (shell-command (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.Pause"))
     (shell-command (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.OpenUri \"string:%s\"")
@@ -107,7 +107,7 @@ Nil values to disable this filter."
 (defun helm-spotify-plus-action-unix (action)
   "Send a given ACTION to dbus."
   (if helm-spotify-plus-dbus-prefer-local
-      (call-process "/bin/bash" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.%s") action))
+      (call-process "/bin/sh" nil nil nil "-c" (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.%s") action))
     (shell-command
      (format (concat helm-spotify-plus-dbus-call "org.mpris.MediaPlayer2.Player.%s") action))))
 
